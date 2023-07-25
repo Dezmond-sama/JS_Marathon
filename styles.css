@@ -31,6 +31,7 @@ body{
     transition: flex 0.5s ease-in-out;
 }
 .slide h3{
+    font-size: 18px;
     color: #fff;
     position: absolute;
     right: 10px;
@@ -39,7 +40,8 @@ body{
     padding: 10px;
     background-color: #0f1013aa;
     border-radius: 10px;
-    max-width: 50%;
+    max-width: 400px;
+    overflow: hidden;
     opacity: 0;
 }
 .slide.active{
