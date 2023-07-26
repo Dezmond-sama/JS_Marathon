@@ -11,3 +11,23 @@ body {
   overflow: hidden;
   margin: 0;
 }
+
+#board {
+  width: 480px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.cell {
+  width: 20px;
+  height: 20px;
+  margin: 2px;
+  background-color: #424242;
+  box-shadow: 0 0 2px #0000;
+  transition: background-color 2s ease, box-shadow 0.5s ease-out, transform 1s ease-in-out;
+}
+
+.cell:hover{
+  transition-duration: 0s;
+  transform: scale(1.15);
+}
