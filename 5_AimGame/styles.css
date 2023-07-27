@@ -59,6 +59,7 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
   list-style: none;
   padding: 0;
 }
@@ -66,7 +67,10 @@ h2 {
 .time-list li {
   margin: 10px;
 }
-
+.break{
+  flex-basis: 100%;
+  height: 0;
+}
 .time-btn {
   background-color: transparent;
   border: 2px solid #73a377;
