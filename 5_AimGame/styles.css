@@ -25,12 +25,18 @@ a:hover {
 .start {
   font-size: 1.5rem;
 }
-
+.reset {
+  margin: 10px;
+}
 h1 {
   line-height: 1.4;
   font-size: 4rem;
 }
 
+h2 {
+  line-height: 1.4;
+  font-size: 3rem;
+}
 .screen {
   display: flex;
   flex-direction: column;
@@ -45,7 +51,6 @@ h1 {
 .screen.up {
   margin-top: -100vh;
 }
-
 .time-list {
   display: flex;
   flex-wrap: wrap;
