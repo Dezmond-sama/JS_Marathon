@@ -38,14 +38,29 @@ const startGame = () => {
 const gameOver = () => {
     timer.parentNode.classList.add("hide");
     scoreBoard.parentNode.classList.add("hide");
-    board.innerHTML = `<h2>Ваш счет: <span class="primary">${gameScore}</span></h2>`;
+    //board.innerHTML = `<h2>Ваш счет: <span class="primary">${gameScore}</span></h2>`;
 };
 
 const createRandomCircle = () => {
     const { width, height } = board.getBoundingClientRect();
     const circle = document.createElement("div");
-    circle.classList.add("circle");
     const diameter = getRandomInt(minCircleDiameter, maxCircleDiameter);
+
+    circle.classList.add("circle");
+    let colorVariant = 1;
+    if (
+        diameter <
+        minCircleDiameter + (maxCircleDiameter - minCircleDiameter) / 4
+    ) {
+        colorVariant = 3;
+    } else if (
+        diameter <
+        minCircleDiameter + (maxCircleDiameter - minCircleDiameter) / 2
+    ) {
+        colorVariant = 2;
+    }
+
+    circle.classList.add(`circle-color-${colorVariant}`);
     circle.style.width = `${diameter}px`;
     circle.style.height = `${diameter}px`;
     const x = getRandomInt(0, width - diameter);
