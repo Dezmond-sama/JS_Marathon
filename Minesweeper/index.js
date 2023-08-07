@@ -5,11 +5,7 @@ const resetBtn = document.querySelector("#reset");
 const width = 10;
 const height = 10;
 const bombs = 10;
-const [fieldData, linkedData, reset] = initFieldData(
-    board,
-    width,
-    height,
-    bombs
-);
+const [newGame, reset] = initFieldData(board, width, height, bombs);
+newGame(width, height, bombs);
 resetBtn.addEventListener("click", reset);
 document.addEventListener("contextmenu", (e) => e.preventDefault());

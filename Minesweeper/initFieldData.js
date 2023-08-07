@@ -1,7 +1,14 @@
-const initFieldData = (board, width, height, bombs) => {
-    let isRunning = false;
-    let isGameover = false;
+const initFieldData = (board) => {
+    let fieldWidth;
+    let fieldHeight;
+    let fieldBombs;
+
+    let isRunning;
+    let isGameover;
     let mouseDownCell;
+    let fieldData;
+    let linkedData;
+
     const states = {
         standard: { next: "protected", html: `` },
         protected: { next: "question", html: `<div class="flag"></div>` },
@@ -13,7 +20,7 @@ const initFieldData = (board, width, height, bombs) => {
             .fill([x - 1, y - 1])
             .map((elem, i) => [elem[0] + (i % 3), elem[1] + ~~(i / 3)])
             .filter((elem) => elem[0] >= 0 && elem[1] >= 0)
-            .filter((elem) => elem[0] < width && elem[1] < height)
+            .filter((elem) => elem[0] < fieldWidth && elem[1] < fieldHeight)
             .filter((elem) => elem[0] != x || elem[1] != y);
     };
 
@@ -74,11 +81,11 @@ const initFieldData = (board, width, height, bombs) => {
     };
 
     const initBombs = (clickX, clickY) => {
-        let counter = bombs;
+        let counter = fieldBombs;
         let iterations = 10; //to prevent infinite loop
         while (counter > 0) {
-            let x = Math.floor(Math.random() * width);
-            let y = Math.floor(Math.random() * height);
+            let x = Math.floor(Math.random() * fieldWidth);
+            let y = Math.floor(Math.random() * fieldHeight);
             if ((x != clickX || y != clickY) && fieldData[y][x] === 0) {
                 fieldData[y][x] = -1;
                 linkedData[y][x].setAttribute("data-value", -1);
@@ -124,16 +131,25 @@ const initFieldData = (board, width, height, bombs) => {
         return rowData.map((cell, x) => createCell(row, cell, x, y));
     };
 
-    const fieldData = Array(height)
-        .fill(0)
-        .map((_) => Array(width).fill(0));
-
-    const linkedData = fieldData.map((row, y) => createRow(board, row, y));
-
-    const reset = () => {
+    const newGame = (width, height, bombs) => {
+        fieldWidth = width;
+        fieldHeight = height;
+        fieldBombs = bombs;
         isRunning = false;
         isGameover = false;
-        Array.prototype.map((row) => row.map((_) => 0), fieldData);
+        fieldData = Array(fieldHeight)
+            .fill(0)
+            .map((_) => Array(fieldWidth).fill(0));
+
+        board.innerHTML = "";
+        linkedData = fieldData.map((row, y) => createRow(board, row, y));
+    };
+
+    const reset = () => {
+        if (!fieldData) return;
+        isRunning = false;
+        isGameover = false;
+        fieldData = fieldData.map((row) => row.map((_) => 0));
         linkedData.forEach((row) =>
             row.forEach((cell) => {
                 cell.setAttribute("data-value", 0);
@@ -149,7 +165,7 @@ const initFieldData = (board, width, height, bombs) => {
         isGameover = true;
     };
 
-    return [fieldData, linkedData, reset];
+    return [newGame, reset];
 };
 
 export default initFieldData;
