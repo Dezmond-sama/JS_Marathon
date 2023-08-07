@@ -10,6 +10,8 @@ const initFieldData = (board) => {
     let linkedData;
     let getNeighbours;
 
+    let closedCells;
+
     const openCell = ({ target }) => {
         if (isGameover) return;
         const cell = target.closest(".cell");
@@ -21,6 +23,7 @@ const initFieldData = (board) => {
             initBombs(x, y);
         }
         cell.classList.remove("closed");
+        closedCells--;
         if (fieldData[y][x] === -1) {
             cell.innerHTML = `<div class="bomb"></div>`;
             gameover();
@@ -109,6 +112,7 @@ const initFieldData = (board) => {
     const newGame = (width, height, bombs) => {
         fieldWidth = width;
         fieldHeight = height;
+        closedCells = width * height;
         fieldBombs = bombs;
         isRunning = false;
         isGameover = false;
@@ -134,6 +138,7 @@ const initFieldData = (board) => {
                 cell.innerHTML = states[states.default]?.html ?? "";
             })
         );
+        closedCells = fieldWidth * fieldHeight;
     };
 
     const gameover = () => {
