@@ -1,19 +1,38 @@
 const initFieldData = (board, width, height, bombs) => {
     let isRunning = false;
 
+    const neighbours = (x, y) => {
+        return Array(9)
+            .fill([x - 1, y - 1])
+            .map((elem, i) => [elem[0] + (i % 3), elem[1] + ~~(i / 3)])
+            .filter((elem) => elem[0] >= 0 && elem[1] >= 0)
+            .filter((elem) => elem[0] < width && elem[1] < height)
+            .filter((elem) => elem[0] != x || elem[1] != y);
+    };
+
+    const getCoords = (cell) => {
+        const x = +cell.getAttribute("data-coord-x");
+        const y = +cell.getAttribute("data-coord-y");
+        return [x, y];
+    };
+
     const cellClicked = ({ target }) => {
-        const x = +target.getAttribute("data-coord-x");
-        const y = +target.getAttribute("data-coord-y");
+        const [x, y] = getCoords(target);
         if (!isRunning) {
             isRunning = true;
             initBombs(x, y);
         }
         target.classList.remove("closed");
+        if (fieldData[y][x] === -1) {
+            gameover();
+            return;
+        }
+        console.log(neighbours(x, y));
     };
 
     const initBombs = (clickX, clickY) => {
-        console.log(clickX, clickY, bombs);
         let counter = bombs;
+        let iterations = 10; //to prevent infinite loop
         while (counter > 0) {
             let x = Math.floor(Math.random() * width);
             let y = Math.floor(Math.random() * height);
@@ -21,6 +40,9 @@ const initFieldData = (board, width, height, bombs) => {
                 fieldData[y][x] = -1;
                 linkedData[y][x].setAttribute("data-value", -1);
                 counter--;
+                iterations = 10;
+            } else {
+                iterations--;
             }
         }
     };
@@ -59,6 +81,11 @@ const initFieldData = (board, width, height, bombs) => {
             })
         );
     };
+
+    const gameover = () => {
+        isRunning = false;
+    };
+
     return [fieldData, linkedData, reset];
 };
 
