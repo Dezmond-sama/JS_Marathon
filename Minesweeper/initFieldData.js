@@ -1,40 +1,15 @@
-const initFieldData = (board) => {
-    let fieldWidth;
-    let fieldHeight;
-    let fieldBombs;
+import { getCoords, getNeighboursClosure } from "./helpers.js";
+import states, { getState, setState } from "./states.js";
 
-    let isRunning;
-    let isGameover;
+const initFieldData = (board) => {
+    let fieldWidth, fieldHeight, fieldBombs;
+    let isRunning, isGameover;
+
     let mouseDownCell;
     let fieldData;
     let linkedData;
+    let getNeighbours;
 
-    const states = {
-        standard: { next: "protected", html: `` },
-        protected: { next: "question", html: `<div class="flag"></div>` },
-        question: { next: "standard", html: `?` },
-        default: "standard",
-    };
-    const getNeighbours = (x, y) => {
-        return Array(9)
-            .fill([x - 1, y - 1])
-            .map((elem, i) => [elem[0] + (i % 3), elem[1] + ~~(i / 3)])
-            .filter((elem) => elem[0] >= 0 && elem[1] >= 0)
-            .filter((elem) => elem[0] < fieldWidth && elem[1] < fieldHeight)
-            .filter((elem) => elem[0] != x || elem[1] != y);
-    };
-
-    const getCoords = (cell) => {
-        const x = +cell.getAttribute("data-coord-x");
-        const y = +cell.getAttribute("data-coord-y");
-        return [x, y];
-    };
-    const getState = (cell) => cell.getAttribute("data-state");
-    const setState = (cell, state) => {
-        console.log("setState", state);
-        cell.setAttribute("data-state", state);
-        cell.innerHTML = states[state]?.html ?? "";
-    };
     const openCell = ({ target }) => {
         if (isGameover) return;
         const cell = target.closest(".cell");
@@ -137,6 +112,7 @@ const initFieldData = (board) => {
         fieldBombs = bombs;
         isRunning = false;
         isGameover = false;
+        getNeighbours = getNeighboursClosure(width, height);
         fieldData = Array(fieldHeight)
             .fill(0)
             .map((_) => Array(fieldWidth).fill(0));
