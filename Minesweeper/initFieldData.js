@@ -26,8 +26,11 @@ const initFieldData = (board) => {
         closedCells--;
         if (fieldData[y][x] === -1) {
             cell.innerHTML = `<div class="bomb"></div>`;
-            gameover();
+            gameover(false);
             return;
+        }
+        if (closedCells - fieldBombs === 0) {
+            gameover(true);
         }
         let neighbourBombs = fieldData[y][x];
         const neighbours = getNeighbours(x, y);
@@ -153,7 +156,7 @@ const initFieldData = (board) => {
         closedCells = fieldWidth * fieldHeight;
     };
 
-    const gameover = () => {
+    const gameover = (isWin) => {
         isRunning = false;
         isGameover = true;
     };
