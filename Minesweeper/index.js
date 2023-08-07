@@ -12,3 +12,4 @@ const [fieldData, linkedData, reset] = initFieldData(
     bombs
 );
 resetBtn.addEventListener("click", reset);
+document.addEventListener("contextmenu", (e) => e.preventDefault());
