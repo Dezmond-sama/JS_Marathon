@@ -1,12 +1,14 @@
 const initFieldData = (board, width, height, bombs) => {
     let isRunning = false;
     let isGameover = false;
+    let mouseDownCell;
     const states = {
         standard: { next: "protected", html: `` },
         protected: { next: "question", html: `<div class="flag"></div>` },
         question: { next: "standard", html: `?` },
+        default: "standard",
     };
-    const neighbours = (x, y) => {
+    const getNeighbours = (x, y) => {
         return Array(9)
             .fill([x - 1, y - 1])
             .map((elem, i) => [elem[0] + (i % 3), elem[1] + ~~(i / 3)])
@@ -26,9 +28,10 @@ const initFieldData = (board, width, height, bombs) => {
         cell.setAttribute("data-state", state);
         cell.innerHTML = states[state]?.html ?? "";
     };
-    const cellClicked = ({ target }) => {
+    const openCell = ({ target }) => {
         if (isGameover) return;
         const cell = target.closest(".cell");
+        if (!cell.classList.contains("closed")) return; //To prevent recursion loop
         if (getState(cell) === "protected") return;
         const [x, y] = getCoords(cell);
         if (!isRunning) {
@@ -42,18 +45,29 @@ const initFieldData = (board, width, height, bombs) => {
             return;
         }
         let neighbourBombs = 0;
-        for (const [neighbourX, neighbourY] of neighbours(x, y)) {
+        const neighbours = getNeighbours(x, y);
+        for (const [neighbourX, neighbourY] of neighbours) {
             if (fieldData[neighbourY][neighbourX] === -1) neighbourBombs++;
         }
-        cell.innerText = neighbourBombs || "";
+        cell.innerHTML = neighbourBombs
+            ? `<span class="digit--${neighbourBombs}">${neighbourBombs}</span>`
+            : ``;
+        if (neighbourBombs === 0) {
+            for (const [neighbourX, neighbourY] of neighbours) {
+                openCell({ target: linkedData[neighbourY][neighbourX] });
+            }
+        }
     };
 
-    const cellRightClicked = ({ target }) => {
+    const changeState = ({ target }) => {
         const cell = target.closest(".cell");
         if (!cell.classList.contains("closed")) return; //Already opened
         const [x, y] = getCoords(cell);
         const state = getState(cell);
         setState(cell, states[state]?.next ?? "");
+    };
+    const openNeighbours = (cell) => {
+        console.log(cell);
     };
     const initBombs = (clickX, clickY) => {
         let counter = bombs;
@@ -79,9 +93,22 @@ const initFieldData = (board, width, height, bombs) => {
         cell.setAttribute("data-coord-x", x);
         cell.setAttribute("data-coord-y", y);
         cell.setAttribute("data-value", cellData);
-        cell.setAttribute("data-state", "standard");
-        cell.addEventListener("click", cellClicked);
-        cell.addEventListener("contextmenu", cellRightClicked);
+        cell.setAttribute("data-state", states.default);
+        cell.addEventListener("click", openCell);
+        cell.addEventListener("contextmenu", changeState);
+        cell.addEventListener("mousedown", ({ button }) => {
+            console.log(button);
+            if (button === 1) {
+                mouseDownCell = cell;
+            }
+        });
+        cell.addEventListener("mouseup", ({ button }) => {
+            if (button === 1 && cell === mouseDownCell) {
+                openNeighbours(cell);
+                mouseDownCell = undefined;
+            }
+        });
+        cell.innerHTML = states[states.default]?.html ?? "";
         row.appendChild(cell);
         return cell;
     };
@@ -107,7 +134,8 @@ const initFieldData = (board, width, height, bombs) => {
             row.forEach((cell) => {
                 cell.setAttribute("data-value", 0);
                 cell.classList.add("closed");
-                cell.innerHTML = "";
+                cell.setAttribute("data-state", states.default);
+                cell.innerHTML = states[states.default]?.html ?? "";
             })
         );
     };
