@@ -45,7 +45,7 @@
     width: 25px;
     height: 25px;
     background-color: #909090;
-
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -97,7 +97,27 @@
     background-color: #4b7fe0;
     box-shadow: inset -5px 0px 3px #1f61dd;
 }
-
+.bomb{
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    border: #000 1px solid;
+    background-color: #505050;
+    box-shadow: inset -4px -4px 5px #000;
+    position: relative;
+}
+.bomb::after{
+    position: absolute;
+    display: block;
+    content: '';
+    top: -3px;
+    right: -3px;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    background: radial-gradient(#ffc401 0%, #ff7301 30%, #c2471700 100%);
+    box-shadow: 0px 0px 3px #f59f00; 
+}
 .digit--1{color: #186b8b}
 .digit--2{color: #228d22}
 .digit--3{color: #b91d1d}

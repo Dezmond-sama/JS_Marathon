@@ -40,7 +40,7 @@ const initFieldData = (board, width, height, bombs) => {
         }
         cell.classList.remove("closed");
         if (fieldData[y][x] === -1) {
-            cell.innerText = "*";
+            cell.innerHTML = `<div class="bomb"></div>`;
             gameover();
             return;
         }
@@ -66,9 +66,13 @@ const initFieldData = (board, width, height, bombs) => {
         const state = getState(cell);
         setState(cell, states[state]?.next ?? "");
     };
+
     const openNeighbours = (cell) => {
+        if (cell.classList.contains("closed")) return; //function only for opened cells
         console.log(cell);
+        const [x, y] = getCoords(cell);
     };
+
     const initBombs = (clickX, clickY) => {
         let counter = bombs;
         let iterations = 10; //to prevent infinite loop
@@ -105,8 +109,8 @@ const initFieldData = (board, width, height, bombs) => {
         cell.addEventListener("mouseup", ({ button }) => {
             if (button === 1 && cell === mouseDownCell) {
                 openNeighbours(cell);
-                mouseDownCell = undefined;
             }
+            mouseDownCell = undefined;
         });
         cell.innerHTML = states[states.default]?.html ?? "";
         row.appendChild(cell);
