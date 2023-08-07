@@ -1,7 +1,11 @@
 const states = {
-    standard: { next: "protected", html: `` },
-    protected: { next: "question", html: `<div class="flag"></div>` },
-    question: { next: "standard", html: `?` },
+    standard: { next: "protected", html: ``, protected: false },
+    protected: {
+        next: "question",
+        html: `<div class="flag"></div>`,
+        protected: true,
+    },
+    question: { next: "standard", html: `?`, protected: false },
     default: "standard",
 };
 

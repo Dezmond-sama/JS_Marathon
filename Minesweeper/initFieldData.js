@@ -7,7 +7,7 @@ const initFieldData = (board) => {
 
     let mouseDownCell;
     let fieldData;
-    let linkedData;
+    let domData;
     let getNeighbours;
 
     let closedCells;
@@ -29,17 +29,14 @@ const initFieldData = (board) => {
             gameover();
             return;
         }
-        let neighbourBombs = 0;
+        let neighbourBombs = fieldData[y][x];
         const neighbours = getNeighbours(x, y);
-        for (const [neighbourX, neighbourY] of neighbours) {
-            if (fieldData[neighbourY][neighbourX] === -1) neighbourBombs++;
-        }
         cell.innerHTML = neighbourBombs
             ? `<span class="digit--${neighbourBombs}">${neighbourBombs}</span>`
             : ``;
         if (neighbourBombs === 0) {
             for (const [neighbourX, neighbourY] of neighbours) {
-                openCell({ target: linkedData[neighbourY][neighbourX] });
+                openCell({ target: domData[neighbourY][neighbourX] });
             }
         }
     };
@@ -56,6 +53,17 @@ const initFieldData = (board) => {
         if (cell.classList.contains("closed")) return; //function only for opened cells
         console.log(cell);
         const [x, y] = getCoords(cell);
+        const neighbours = getNeighbours(x, y);
+        let flagCounter = 0;
+        for (const [neighbourX, neighbourY] of neighbours) {
+            if (states[getState(domData[neighbourY][neighbourX])]?.protected)
+                flagCounter++;
+        }
+        if (fieldData[y][x] !== flagCounter) return;
+
+        for (const [neighbourX, neighbourY] of neighbours) {
+            openCell({ target: domData[neighbourY][neighbourX] });
+        }
     };
 
     const initBombs = (clickX, clickY) => {
@@ -64,9 +72,13 @@ const initFieldData = (board) => {
         while (counter > 0) {
             let x = Math.floor(Math.random() * fieldWidth);
             let y = Math.floor(Math.random() * fieldHeight);
-            if ((x != clickX || y != clickY) && fieldData[y][x] === 0) {
+            if ((x != clickX || y != clickY) && fieldData[y][x] !== -1) {
                 fieldData[y][x] = -1;
-                linkedData[y][x].setAttribute("data-value", -1);
+                for (const [neighbourX, neighbourY] of getNeighbours(x, y)) {
+                    if (fieldData[neighbourY][neighbourX] !== -1)
+                        fieldData[neighbourY][neighbourX]++;
+                }
+                domData[y][x].setAttribute("data-value", -1);
                 counter--;
                 iterations = 10;
             } else {
@@ -122,7 +134,7 @@ const initFieldData = (board) => {
             .map((_) => Array(fieldWidth).fill(0));
 
         board.innerHTML = "";
-        linkedData = fieldData.map((row, y) => createRow(board, row, y));
+        domData = fieldData.map((row, y) => createRow(board, row, y));
     };
 
     const reset = () => {
@@ -130,7 +142,7 @@ const initFieldData = (board) => {
         isRunning = false;
         isGameover = false;
         fieldData = fieldData.map((row) => row.map((_) => 0));
-        linkedData.forEach((row) =>
+        domData.forEach((row) =>
             row.forEach((cell) => {
                 cell.setAttribute("data-value", 0);
                 cell.classList.add("closed");
