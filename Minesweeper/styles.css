@@ -1,0 +1,41 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+.wrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: #c20b0b solid 1px;
+    height: 100vh;
+}
+#board{
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    display: inline-block;
+    vertical-align: top;
+    background-color: #707070;
+}
+.row{
+    display: flex;
+    
+}
+
+.cell{
+    margin: 1px;
+    width: 25px;
+    height: 25px;
+}
+.cell-box{
+    border-style: solid;
+    border-width: 3px;
+    border-left-color: #909090;
+    border-top-color: #909090;
+    border-bottom-color: #505050;
+    border-right-color: #505050;
+}
