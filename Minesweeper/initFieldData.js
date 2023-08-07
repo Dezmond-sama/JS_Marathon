@@ -1,7 +1,11 @@
 const initFieldData = (board, width, height, bombs) => {
     let isRunning = false;
     let isGameover = false;
-
+    const states = {
+        standard: { next: "protected", html: `` },
+        protected: { next: "question", html: `<div class="flag"></div>` },
+        question: { next: "standard", html: `?` },
+    };
     const neighbours = (x, y) => {
         return Array(9)
             .fill([x - 1, y - 1])
@@ -20,18 +24,7 @@ const initFieldData = (board, width, height, bombs) => {
     const setState = (cell, state) => {
         console.log("setState", state);
         cell.setAttribute("data-state", state);
-        switch (state) {
-            case "protected":
-                cell.innerHTML = `<div class="flag"></div>`;
-                break;
-            case "question":
-                cell.innerHTML = "?";
-                break;
-
-            default:
-                cell.innerHTML = "";
-                break;
-        }
+        cell.innerHTML = states[state]?.html ?? "";
     };
     const cellClicked = ({ target }) => {
         if (isGameover) return;
@@ -60,17 +53,7 @@ const initFieldData = (board, width, height, bombs) => {
         if (!cell.classList.contains("closed")) return; //Already opened
         const [x, y] = getCoords(cell);
         const state = getState(cell);
-        switch (state) {
-            case "protected":
-                setState(cell, "question");
-                break;
-            case "question":
-                setState(cell, "standard");
-                break;
-            default:
-                setState(cell, "protected");
-                break;
-        }
+        setState(cell, states[state]?.next ?? "");
     };
     const initBombs = (clickX, clickY) => {
         let counter = bombs;
