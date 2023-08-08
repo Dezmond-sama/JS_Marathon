@@ -8,18 +8,27 @@ const resetBtn = document.querySelector("#reset");
 const newgameBtn = document.querySelector("#newgame");
 const newgameSelectors = document.querySelector("#newgameItems");
 const scrTemplates = document.querySelector("#screens");
+
 let width = 10;
 let height = 10;
 let bombs = 10;
+
 let interval = undefined;
 let time = 0;
 
+(() => {
+    width = +localStorage.getItem("width") || width;
+    height = +localStorage.getItem("height") || height;
+    bombs = +localStorage.getItem("bombs") || bombs;
+})();
+
 const [newGame, reset] = initFieldData(board);
-newGame(width, height, bombs);
+
 resetBtn.addEventListener("click", () => {
     resetGameData();
     reset();
 });
+
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 board.addEventListener("gameover", ({ detail }) => {
     clearInterval(interval);
@@ -59,16 +68,21 @@ newgameBtn.addEventListener("click", (e) => {
         ?.querySelector(".dropdown-menu")
         ?.classList.toggle("visible");
 });
+
 newgameSelectors.addEventListener("click", (e) => {
     if (e.target.hasAttribute("data-width")) {
         width = +e.target.getAttribute("data-width") || width;
         height = +e.target.getAttribute("data-height") || height;
         bombs = +e.target.getAttribute("data-bombs") || bombs;
-        newGame(width, height, bombs);
+        localStorage.setItem("width", width);
+        localStorage.setItem("height", height);
+        localStorage.setItem("bombs", bombs);
+
+        resetGameData();
+        newGame(width, height, bombs, true);
     }
 });
 
-// Закройте выпадающее меню, если пользователь щелкает за его пределами
 window.addEventListener("click", (event) => {
     if (event.target.classList.contains("dropdown-button")) return;
     const dropdowns = document.querySelectorAll(".dropdown-menu");
@@ -77,6 +91,7 @@ window.addEventListener("click", (event) => {
     });
 });
 
+//Prevent middle mouse scrolling
 document.body.addEventListener("mousedown", (e) => {
     if (e.button === 1) {
         e.preventDefault();
@@ -85,3 +100,4 @@ document.body.addEventListener("mousedown", (e) => {
 });
 
 resetGameData();
+newGame(width, height, bombs);

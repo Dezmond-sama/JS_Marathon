@@ -1,5 +1,5 @@
 import { getCoords, getNeighboursClosure } from "./helpers.js";
-import states, { getState, setState } from "./states.js";
+import states, { findStateByShort, getState, setState } from "./states.js";
 
 const initFieldData = (board) => {
     let fieldWidth, fieldHeight, fieldBombs;
@@ -12,10 +12,17 @@ const initFieldData = (board) => {
     let currentStates = {};
 
     let closedCells;
-
-    const openCell = ({ target }) => {
+    const setCellInnerHTML = (cell, value) => {
+        if (value >= 0) {
+            cell.innerHTML = value
+                ? `<span class="digit--${value}">${value}</span>`
+                : ``;
+        } else if (value === -1) {
+            cell.innerHTML = `<div class="bomb"></div>`;
+        }
+    };
+    const openCell = (cell, save) => {
         if (isGameover) return;
-        const cell = target.closest(".cell");
         if (!cell.classList.contains("closed")) return; //To prevent recursion loop
         if (getState(cell) === "protected") return;
         const [x, y] = getCoords(cell);
@@ -25,28 +32,25 @@ const initFieldData = (board) => {
         }
         cell.classList.remove("closed");
         closedCells--;
+        setCellInnerHTML(cell, fieldData[y][x]);
         if (fieldData[y][x] === -1) {
-            cell.innerHTML = `<div class="bomb"></div>`;
             gameover(false);
             return;
         }
         if (closedCells - fieldBombs === 0) {
             gameover(true);
+            return;
         }
-        let neighbourBombs = fieldData[y][x];
         const neighbours = getNeighbours(x, y);
-        cell.innerHTML = neighbourBombs
-            ? `<span class="digit--${neighbourBombs}">${neighbourBombs}</span>`
-            : ``;
-        if (neighbourBombs === 0) {
+        if (fieldData[y][x] === 0) {
             for (const [neighbourX, neighbourY] of neighbours) {
-                openCell({ target: domData[neighbourY][neighbourX] });
+                openCell(domData[neighbourY][neighbourX], false);
             }
         }
+        if (save) saveDataToLocalStore();
     };
 
-    const changeState = ({ target }) => {
-        const cell = target.closest(".cell");
+    const changeState = (cell) => {
         if (!cell.classList.contains("closed")) return; //Already opened
         const [x, y] = getCoords(cell);
         let state = getState(cell);
@@ -59,6 +63,7 @@ const initFieldData = (board) => {
                 detail: { states: currentStates },
             })
         );
+        saveDataToLocalStore();
     };
 
     const openNeighbours = (cell) => {
@@ -73,8 +78,9 @@ const initFieldData = (board) => {
         if (fieldData[y][x] !== flagCounter) return;
 
         for (const [neighbourX, neighbourY] of neighbours) {
-            openCell({ target: domData[neighbourY][neighbourX] });
+            openCell(domData[neighbourY][neighbourX], false);
         }
+        saveDataToLocalStore();
     };
 
     const initBombs = (clickX, clickY) => {
@@ -99,16 +105,28 @@ const initFieldData = (board) => {
         board.dispatchEvent(new CustomEvent("gamestart"));
     };
 
-    const createCell = (row, cellData, x, y) => {
+    const createCell = (row, cellData, x, y, state) => {
         const cell = document.createElement("div");
 
-        cell.classList.add("cell", "closed", "cell-box");
+        cell.classList.add("cell", "cell-box");
         cell.setAttribute("data-coord-x", x);
         cell.setAttribute("data-coord-y", y);
         cell.setAttribute("data-value", cellData);
-        cell.setAttribute("data-state", states.default);
-        cell.addEventListener("click", openCell);
-        cell.addEventListener("contextmenu", changeState);
+        cell.innerHTML = states[state ?? states.default]?.html ?? "";
+        if (state) {
+            if (state === "o") {
+                cell.setAttribute("data-state", states.default);
+                setCellInnerHTML(cell, cellData);
+            } else {
+                cell.setAttribute("data-state", state);
+                cell.classList.add("closed");
+            }
+        } else {
+            cell.setAttribute("data-state", states.default);
+            cell.classList.add("closed");
+        }
+        cell.addEventListener("click", () => openCell(cell, true));
+        cell.addEventListener("contextmenu", () => changeState(cell));
         cell.addEventListener("mousedown", ({ button }) => {
             if (button === 1) {
                 mouseDownCell = cell;
@@ -120,36 +138,51 @@ const initFieldData = (board) => {
             }
             mouseDownCell = undefined;
         });
-        cell.innerHTML = states[states.default]?.html ?? "";
         row.appendChild(cell);
         return cell;
     };
 
-    const createRow = (board, rowData, y) => {
+    const createRow = (board, rowData, y, rowStates) => {
         const row = document.createElement("div");
         row.classList.add("row");
         board.appendChild(row);
-        return rowData.map((cell, x) => createCell(row, cell, x, y));
+        if (rowStates) {
+            return rowData.map((cell, x) =>
+                createCell(row, cell, x, y, rowStates[x])
+            );
+        } else {
+            return rowData.map((cell, x) => createCell(row, cell, x, y));
+        }
     };
 
-    const fillDomData = () => {
+    const fillDomData = (statesData) => {
+        console.log(statesData);
         board.innerHTML = "";
-        domData = fieldData.map((row, y) => createRow(board, row, y));
+        if (statesData) {
+            domData = fieldData.map((row, y) =>
+                createRow(board, row, y, statesData[y])
+            );
+        } else {
+            domData = fieldData.map((row, y) => createRow(board, row, y));
+        }
         closedCells = fieldWidth * fieldHeight;
         currentStates[states.default] = closedCells;
     };
 
-    const newGame = (width, height, bombs) => {
+    const newGame = (width, height, bombs, clear) => {
         fieldWidth = width;
         fieldHeight = height;
         fieldBombs = bombs;
         isRunning = false;
         isGameover = false;
         getNeighbours = getNeighboursClosure(width, height);
-        fieldData = Array(fieldHeight)
-            .fill(0)
-            .map((_) => Array(fieldWidth).fill(0));
-        fillDomData();
+        if (clear || !loadDataFromLocalStore()) {
+            fieldData = Array(fieldHeight)
+                .fill(0)
+                .map((_) => Array(fieldWidth).fill(0));
+            saveDataToLocalStore();
+            fillDomData();
+        }
     };
 
     const reset = () => {
@@ -158,15 +191,73 @@ const initFieldData = (board) => {
         isGameover = false;
         fieldData = fieldData.map((row) => row.map((_) => 0));
         currentStates = {};
+        clearDataFromLocalStore();
         fillDomData();
     };
 
     const gameover = (isWin) => {
         isRunning = false;
         isGameover = true;
+        clearDataFromLocalStore();
         board.dispatchEvent(
             new CustomEvent("gameover", { detail: { win: isWin } })
         );
+    };
+
+    const saveDataToLocalStore = () => {
+        localStorage.setItem("fieldData", fieldData);
+        localStorage.setItem(
+            "fieldStates",
+            domData?.map((row) =>
+                row.map((elem) =>
+                    elem.classList.contains("closed")
+                        ? states[getState(elem)]?.short
+                        : "o"
+                )
+            )
+        );
+    };
+
+    const clearDataFromLocalStore = () => {
+        localStorage.removeItem("fieldData");
+        localStorage.removeItem("fieldStates");
+    };
+
+    const loadDataFromLocalStore = () => {
+        let bombs = 0;
+        const savedData = localStorage
+            .getItem("fieldData")
+            ?.split(",")
+            .map((value) => {
+                const res = +value;
+                if (res === -1) bombs++;
+                return res;
+            });
+        const savedStates = localStorage
+            .getItem("fieldStates")
+            ?.split(",")
+            .map((value) => findStateByShort(value));
+        if (
+            savedData &&
+            savedStates &&
+            savedData.length === savedStates.length &&
+            savedData.length === fieldWidth * fieldHeight &&
+            bombs === fieldBombs
+        ) {
+            isRunning = true;
+            fieldData = [];
+            const statesData = [];
+            while (savedData.length) {
+                fieldData.push(savedData.splice(0, fieldWidth));
+                statesData.push(savedStates.splice(0, fieldWidth));
+            }
+            fillDomData(statesData);
+            board.dispatchEvent(new CustomEvent("gamestart"));
+            return true;
+        } else {
+            clearDataFromLocalStore();
+        }
+        return false;
     };
 
     return [newGame, reset];
