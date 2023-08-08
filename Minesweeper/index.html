@@ -9,13 +9,16 @@
     </head>
     <body>
         <div class="wrapper">
-            <div class="stats">
-                <div id="timer"></div>
+            <div class="content">
+                <div class="stats">
+                    <div id="flags" class="stats-box cell-box">0/0</div>
+                    <div id="timer" class="stats-box cell-box"></div>
+                </div>
+                <div class="buttons">
+                    <div id="reset" class="button">Reset</div>
+                </div>
+                <div id="board"></div>
             </div>
-            <div class="buttons">
-                <div id="reset">Reset</div>
-            </div>
-            <div id="board"></div>
         </div>
         <template id="screens">
             <div class="splash loose hidden"><p>You loose!</p></div>

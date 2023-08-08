@@ -3,6 +3,7 @@ import initFieldData from "./initFieldData.js";
 
 const board = document.querySelector("#board");
 const timer = document.querySelector("#timer");
+const flags = document.querySelector("#flags");
 const resetBtn = document.querySelector("#reset");
 const scrTemplates = document.querySelector("#screens");
 const width = 10;
@@ -14,13 +15,13 @@ let time = 0;
 const [newGame, reset] = initFieldData(board, width, height, bombs);
 newGame(width, height, bombs);
 resetBtn.addEventListener("click", () => {
-    resetTimer();
+    resetGameData();
     reset();
 });
 document.addEventListener("contextmenu", (e) => e.preventDefault());
-board.addEventListener("gameover", (e) => {
+board.addEventListener("gameover", ({ detail }) => {
     clearInterval(interval);
-    const className = e.detail.win ? "win" : "loose";
+    const className = detail.win ? "win" : "loose";
     const gameoverScreen = scrTemplates.content
         .querySelector(`.${className}`)
         .cloneNode(true);
@@ -29,14 +30,20 @@ board.addEventListener("gameover", (e) => {
         gameoverScreen.classList.remove("hidden");
     }, 0);
 });
-const resetTimer = () => {
+const resetGameData = () => {
+    flags.innerHTML = `0/${bombs}`;
     clearInterval(interval);
     time = 0;
     timer.innerHTML = intToTimeString(0);
 };
+
 board.addEventListener("gamestart", (e) => {
-    resetTimer();
+    resetGameData();
     interval = setInterval(updateTimer, 1000);
+});
+
+board.addEventListener("changestate", ({ detail }) => {
+    flags.innerHTML = `${detail.states?.protected || 0}/${bombs}`;
 });
 
 const updateTimer = () => {
@@ -44,4 +51,4 @@ const updateTimer = () => {
     timer.innerHTML = intToTimeString(time);
 };
 
-resetTimer();
+resetGameData();

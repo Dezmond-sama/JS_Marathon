@@ -9,6 +9,7 @@ const initFieldData = (board) => {
     let fieldData;
     let domData;
     let getNeighbours;
+    let currentStates = {};
 
     let closedCells;
 
@@ -48,13 +49,20 @@ const initFieldData = (board) => {
         const cell = target.closest(".cell");
         if (!cell.classList.contains("closed")) return; //Already opened
         const [x, y] = getCoords(cell);
-        const state = getState(cell);
-        setState(cell, states[state]?.next ?? "");
+        let state = getState(cell);
+        currentStates[state] = (currentStates[state] || 0) - 1;
+        state = states[state]?.next ?? "";
+        setState(cell, state);
+        currentStates[state] = (currentStates[state] || 0) + 1;
+        board.dispatchEvent(
+            new CustomEvent("changestate", {
+                detail: { states: currentStates },
+            })
+        );
     };
 
     const openNeighbours = (cell) => {
         if (cell.classList.contains("closed")) return; //function only for opened cells
-        console.log(cell);
         const [x, y] = getCoords(cell);
         const neighbours = getNeighbours(x, y);
         let flagCounter = 0;
@@ -129,6 +137,7 @@ const initFieldData = (board) => {
         board.innerHTML = "";
         domData = fieldData.map((row, y) => createRow(board, row, y));
         closedCells = fieldWidth * fieldHeight;
+        currentStates[states.default] = closedCells;
     };
 
     const newGame = (width, height, bombs) => {
@@ -149,6 +158,7 @@ const initFieldData = (board) => {
         isRunning = false;
         isGameover = false;
         fieldData = fieldData.map((row) => row.map((_) => 0));
+        currentStates = {};
         fillDomData();
     };
 
