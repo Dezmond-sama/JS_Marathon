@@ -5,14 +5,16 @@ const board = document.querySelector("#board");
 const timer = document.querySelector("#timer");
 const flags = document.querySelector("#flags");
 const resetBtn = document.querySelector("#reset");
+const newgameBtn = document.querySelector("#newgame");
+const newgameSelectors = document.querySelector("#newgameItems");
 const scrTemplates = document.querySelector("#screens");
-const width = 10;
-const height = 10;
-const bombs = 10;
+let width = 10;
+let height = 10;
+let bombs = 10;
 let interval = undefined;
 let time = 0;
 
-const [newGame, reset] = initFieldData(board, width, height, bombs);
+const [newGame, reset] = initFieldData(board);
 newGame(width, height, bombs);
 resetBtn.addEventListener("click", () => {
     resetGameData();
@@ -50,5 +52,29 @@ const updateTimer = () => {
     time++;
     timer.innerHTML = intToTimeString(time);
 };
+
+newgameBtn.addEventListener("click", (e) => {
+    e.target
+        .closest(".dropdown-menu-container")
+        ?.querySelector(".dropdown-menu")
+        ?.classList.toggle("visible");
+});
+newgameSelectors.addEventListener("click", (e) => {
+    if (e.target.hasAttribute("data-width")) {
+        width = +e.target.getAttribute("data-width") || width;
+        height = +e.target.getAttribute("data-height") || height;
+        bombs = +e.target.getAttribute("data-bombs") || bombs;
+        newGame(width, height, bombs);
+    }
+});
+
+// Закройте выпадающее меню, если пользователь щелкает за его пределами
+window.addEventListener("click", (event) => {
+    if (event.target.classList.contains("dropdown-button")) return;
+    const dropdowns = document.querySelectorAll(".dropdown-menu");
+    dropdowns.forEach((dd) => {
+        dd.classList.remove("visible");
+    });
+});
 
 resetGameData();

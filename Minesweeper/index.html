@@ -9,15 +9,58 @@
     </head>
     <body>
         <div class="wrapper">
-            <div class="content">
-                <div class="stats">
-                    <div id="flags" class="stats-box cell-box">0/0</div>
-                    <div id="timer" class="stats-box cell-box"></div>
+            <div class="scroller">
+                <div class="content">
+                    <div class="stats">
+                        <div id="flags" class="stats-box cell-box">0/0</div>
+                        <div id="timer" class="stats-box cell-box"></div>
+                    </div>
+                    <div class="buttons">
+                        <div class="dropdown-menu-container">
+                            <div id="newgame" class="button dropdown-button">
+                                New Game
+                            </div>
+                            <div class="dropdown-menu" id="newgameItems">
+                                <ul>
+                                    <li
+                                        class="button"
+                                        data-width="10"
+                                        data-height="10"
+                                        data-bombs="10"
+                                    >
+                                        Easy
+                                    </li>
+                                    <li
+                                        class="button"
+                                        data-width="15"
+                                        data-height="20"
+                                        data-bombs="30"
+                                    >
+                                        Medium
+                                    </li>
+                                    <li
+                                        class="button"
+                                        data-width="30"
+                                        data-height="30"
+                                        data-bombs="120"
+                                    >
+                                        Hard
+                                    </li>
+                                    <li
+                                        class="button"
+                                        data-width="40"
+                                        data-height="40"
+                                        data-bombs="400"
+                                    >
+                                        Insane
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="reset" class="button">Reset</div>
+                    </div>
+                    <div id="board"></div>
                 </div>
-                <div class="buttons">
-                    <div id="reset" class="button">Reset</div>
-                </div>
-                <div id="board"></div>
             </div>
         </div>
         <template id="screens">

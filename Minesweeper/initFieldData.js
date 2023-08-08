@@ -146,6 +146,7 @@ const initFieldData = (board) => {
         fieldBombs = bombs;
         isRunning = false;
         isGameover = false;
+        console.log(width, height, bombs);
         getNeighbours = getNeighboursClosure(width, height);
         fieldData = Array(fieldHeight)
             .fill(0)

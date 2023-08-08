@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Handjet:wght@700&family=Roboto&display=swap');
 
+
+
 *{
     font-family: Handjet, Roboto, serif;
     box-sizing: border-box;
@@ -8,11 +10,15 @@
     user-select: none;
 }
 .wrapper{
+    padding: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
+}
+.scroller{
+    overflow: auto;
 }
 .content{
     margin: 20px auto;
@@ -38,25 +44,51 @@
     text-align: right;
     width: 50%;
     font-size: 24px;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     box-shadow: inset -15px -5px 10px #1be21b5b;
 }
 .button{
     font-size: 18px;
+    letter-spacing: 1px;
     width: 100px;
     height: 30px;
     border: #000 solid 1px;
+    background: #b6b6b6;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-#reset:hover{
+.button:hover{
     box-shadow: 0px 0px 5px #505050;
 }
-#reset:active{
+.button:active{
     box-shadow: inset 0px 0px 5px #505050;
 }
+.dropdown-menu-container{
+    position: relative;
+    display: inline-block;
+}
+.dropdown-menu{
+    display: none;
+    position: absolute;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 100;
+}
+.dropdown-menu ul{
+    list-style: none;
+}
+.dropdown-menu.visible{
+    display: block;
+}
+.dropdown-menu li{
+    margin-top: 2px;
+}
+.dropdown-menu li.button{
+    background-color: #d6d6d6;
+}
 #board{
+    min-width: 100px;
+    min-height: 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -169,7 +201,7 @@
     right: 0px;    
     opacity: 1;
 }
-.hidden{
+.splash.hidden{
     opacity: 0;
 }
 
