@@ -110,13 +110,12 @@ const initFieldData = (board) => {
         cell.addEventListener("click", openCell);
         cell.addEventListener("contextmenu", changeState);
         cell.addEventListener("mousedown", ({ button }) => {
-            console.log(button);
             if (button === 1) {
                 mouseDownCell = cell;
             }
         });
-        cell.addEventListener("mouseup", ({ button }) => {
-            if (button === 1 && cell === mouseDownCell) {
+        cell.addEventListener("mouseup", (e) => {
+            if (e.button === 1 && cell === mouseDownCell) {
                 openNeighbours(cell);
             }
             mouseDownCell = undefined;
@@ -146,7 +145,6 @@ const initFieldData = (board) => {
         fieldBombs = bombs;
         isRunning = false;
         isGameover = false;
-        console.log(width, height, bombs);
         getNeighbours = getNeighboursClosure(width, height);
         fieldData = Array(fieldHeight)
             .fill(0)

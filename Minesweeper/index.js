@@ -77,4 +77,11 @@ window.addEventListener("click", (event) => {
     });
 });
 
+document.body.addEventListener("mousedown", (e) => {
+    if (e.button === 1) {
+        e.preventDefault();
+        return false;
+    }
+});
+
 resetGameData();
