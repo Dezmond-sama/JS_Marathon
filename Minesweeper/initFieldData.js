@@ -123,11 +123,14 @@ const initFieldData = (board) => {
         board.appendChild(row);
         return rowData.map((cell, x) => createCell(row, cell, x, y));
     };
-
+    const fillDomData = () => {
+        board.innerHTML = "";
+        domData = fieldData.map((row, y) => createRow(board, row, y));
+        closedCells = fieldWidth * fieldHeight;
+    };
     const newGame = (width, height, bombs) => {
         fieldWidth = width;
         fieldHeight = height;
-        closedCells = width * height;
         fieldBombs = bombs;
         isRunning = false;
         isGameover = false;
@@ -135,9 +138,7 @@ const initFieldData = (board) => {
         fieldData = Array(fieldHeight)
             .fill(0)
             .map((_) => Array(fieldWidth).fill(0));
-
-        board.innerHTML = "";
-        domData = fieldData.map((row, y) => createRow(board, row, y));
+        fillDomData();
     };
 
     const reset = () => {
@@ -145,20 +146,15 @@ const initFieldData = (board) => {
         isRunning = false;
         isGameover = false;
         fieldData = fieldData.map((row) => row.map((_) => 0));
-        domData.forEach((row) =>
-            row.forEach((cell) => {
-                cell.setAttribute("data-value", 0);
-                cell.classList.add("closed");
-                cell.setAttribute("data-state", states.default);
-                cell.innerHTML = states[states.default]?.html ?? "";
-            })
-        );
-        closedCells = fieldWidth * fieldHeight;
+        fillDomData();
     };
 
     const gameover = (isWin) => {
         isRunning = false;
         isGameover = true;
+        board.dispatchEvent(
+            new CustomEvent("gameover", { detail: { win: isWin } })
+        );
     };
 
     return [newGame, reset];
