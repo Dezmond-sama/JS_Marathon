@@ -66,6 +66,16 @@ const initFieldData = (board) => {
         saveDataToLocalStore();
     };
 
+    const updateCurrentStates = () => {
+        currentStates = {};
+        domData.forEach((row) =>
+            row.forEach((elem) => {
+                const state = getState(elem);
+                currentStates[state] = (currentStates[state] || 0) + 1;
+            })
+        );
+    };
+
     const openNeighbours = (cell) => {
         if (cell.classList.contains("closed")) return; //function only for opened cells
         const [x, y] = getCoords(cell);
@@ -80,7 +90,7 @@ const initFieldData = (board) => {
         for (const [neighbourX, neighbourY] of neighbours) {
             openCell(domData[neighbourY][neighbourX], false);
         }
-        saveDataToLocalStore();
+        if (isRunning) saveDataToLocalStore();
     };
 
     const initBombs = (clickX, clickY) => {
@@ -156,16 +166,25 @@ const initFieldData = (board) => {
     };
 
     const fillDomData = (statesData) => {
-        console.log(statesData);
         board.innerHTML = "";
+        closedCells = fieldWidth * fieldHeight;
         if (statesData) {
             domData = fieldData.map((row, y) =>
                 createRow(board, row, y, statesData[y])
             );
+            const opened = statesData.reduce(
+                (total, row) =>
+                    total +
+                    row.reduce((inRow, elem) => {
+                        if (elem === "o") return inRow + 1;
+                        else return inRow;
+                    }, 0),
+                0
+            );
+            closedCells -= opened;
         } else {
             domData = fieldData.map((row, y) => createRow(board, row, y));
         }
-        closedCells = fieldWidth * fieldHeight;
         currentStates[states.default] = closedCells;
     };
 
@@ -253,6 +272,12 @@ const initFieldData = (board) => {
             }
             fillDomData(statesData);
             board.dispatchEvent(new CustomEvent("gamestart"));
+            updateCurrentStates();
+            board.dispatchEvent(
+                new CustomEvent("changestate", {
+                    detail: { states: currentStates },
+                })
+            );
             return true;
         } else {
             clearDataFromLocalStore();
