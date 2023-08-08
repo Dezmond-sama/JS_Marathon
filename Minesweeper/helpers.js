@@ -13,3 +13,9 @@ export const getCoords = (cell) => {
     const y = +cell.getAttribute("data-coord-y");
     return [x, y];
 };
+
+export const intToTimeString = (time) => {
+    const minutes = ("0" + ~~(time / 60)).slice(-2);
+    const seconds = ("0" + (time % 60)).slice(-2);
+    return `${minutes}:${seconds}`;
+};

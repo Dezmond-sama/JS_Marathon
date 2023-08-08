@@ -88,6 +88,7 @@ const initFieldData = (board) => {
                 iterations--;
             }
         }
+        board.dispatchEvent(new CustomEvent("gamestart"));
     };
 
     const createCell = (row, cellData, x, y) => {
@@ -123,11 +124,13 @@ const initFieldData = (board) => {
         board.appendChild(row);
         return rowData.map((cell, x) => createCell(row, cell, x, y));
     };
+
     const fillDomData = () => {
         board.innerHTML = "";
         domData = fieldData.map((row, y) => createRow(board, row, y));
         closedCells = fieldWidth * fieldHeight;
     };
+
     const newGame = (width, height, bombs) => {
         fieldWidth = width;
         fieldHeight = height;
