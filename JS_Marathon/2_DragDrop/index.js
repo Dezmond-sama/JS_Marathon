@@ -17,8 +17,8 @@ const dragenter = ({ target }) => {
     placeholder.classList.add("draghover");
 };
 const dragleave = (event) => {
-    //dragleave срабатывает и при наведении на дочерние элементы, из-за этого выделение не работает корректно
-    //решение со сцетчиком помогает, но при быстром перемещении мыши счетчик сбивается, поэтому нужно другое решение
+    //dragleave also invokes on hovering over child elements, because of this, the selection does not work correctly
+    //the solution found on the Internet with the counter helps, but when moving the mouse quickly, the counter gets lost, so another solution is needed
     let placeholder = event.target.closest(".placeholder");
     placeholder.classList.remove("draghover");
 };
