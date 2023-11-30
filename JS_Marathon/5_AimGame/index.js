@@ -38,7 +38,7 @@ const startGame = () => {
 const gameOver = () => {
     timer.parentNode.classList.add("hide");
     scoreBoard.parentNode.classList.add("hide");
-    board.innerHTML = `<h2>Ваш счет: <span class="primary">${gameScore}</span></h2>`;
+    board.innerHTML = `<h2>Total score: <span class="primary">${gameScore}</span></h2>`;
 };
 
 const createRandomCircle = () => {
