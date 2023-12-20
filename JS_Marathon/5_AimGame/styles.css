@@ -36,9 +36,10 @@ a:hover {
     font-size: 2rem;
 }
 h1 {
-    line-height: 1.4;
-    font-size: 4rem;
+    line-height: 1;
+    font-size: 3rem;
     @media (min-width: 500px) {
+        line-height: 1.4;
         font-size: 6rem;
     }
 }
@@ -64,6 +65,7 @@ h2 {
     margin-top: -100vh;
 }
 .time-list {
+    margin: 0;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -78,6 +80,9 @@ h2 {
 .break {
     flex-basis: 100%;
     height: 0;
+}
+.time-list li.break {
+    margin: 0px;
 }
 .time-btn {
     background-color: transparent;
@@ -126,12 +131,13 @@ h2 {
     justify-content: center;
     align-items: center;
     position: relative;
-    width: 500px;
-    height: 500px;
-    transform: scale(0.6);
+    flex: 1;
+    max-width: 90%;
+    aspect-ratio: 1 / 1;
     background: linear-gradient(118.38deg, #1b271c 45%, #1d5a25 200.44%);
     @media (min-width: 500px) {
-        transform: scale(1);
+        max-width: 500px;
+        max-height: 500px;
         background: repeating-linear-gradient(
                 transparent,
                 transparent 30px,

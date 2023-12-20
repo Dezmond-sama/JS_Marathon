@@ -63,10 +63,10 @@ const createRandomCircle = () => {
     circle.classList.add(`circle-color-${colorVariant}`);
     circle.style.width = `${diameter}px`;
     circle.style.height = `${diameter}px`;
-    const x = getRandomInt(0, width - diameter);
-    const y = getRandomInt(0, height - diameter);
-    circle.style.left = `${x}px`;
-    circle.style.top = `${y}px`;
+    const x = getRandomInt(5, 95);
+    const y = getRandomInt(5, 95);
+    circle.style.left = `${x}%`;
+    circle.style.top = `${y}%`;
 
     board.append(circle);
 };
