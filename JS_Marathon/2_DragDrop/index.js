@@ -1,4 +1,5 @@
 let dragged = null;
+let shift = [0, 0];
 
 const dragable = document.querySelectorAll(".item");
 const dropPositions = document.querySelectorAll(".placeholder");
@@ -33,9 +34,51 @@ const dragdrop = ({ target }) => {
     }
 };
 
+const getCoords = (e) => {
+    const touch = e.touches[0] || e.changedTouches[0];
+    const x = touch.pageX;
+    const y = touch.pageY;
+    return [x, y];
+};
+const touchstart = (e) => {
+    const target = e.target;
+    const [touchX, touchY] = getCoords(e);
+    target.classList.add("drag");
+    const { x, y } = target.getBoundingClientRect();
+    shift = [touchX - x, touchY - y];
+};
+const touchmove = (e) => {
+    const target = e.target;
+    const [touchX, touchY] = getCoords(e);
+    target.style.left = `${touchX - shift[0]}px`;
+    target.style.top = `${touchY - shift[1]}px`;
+};
+const touchend = (e) => {
+    const target = e.target;
+    target.style.left = "";
+    target.style.top = "";
+    target.classList.remove("drag");
+};
+const touchdrop = (e) => {
+    const dragged = e.target;
+    if (!dragged || !dragged.classList.contains("item")) return;
+    const target = document.elementFromPoint(
+        e.changedTouches[0].clientX,
+        e.changedTouches[0].clientY
+    );
+    let placeholder = target.closest(".placeholder");
+    if (!placeholder) return;
+    placeholder.classList.remove("draghover");
+    placeholder.appendChild(dragged);
+};
+
 dragable.forEach((elem) => {
     elem.addEventListener("dragstart", dragstart);
     elem.addEventListener("dragend", dragend);
+
+    elem.addEventListener("touchstart", touchstart);
+    elem.addEventListener("touchmove", touchmove);
+    elem.addEventListener("touchend", touchend);
 });
 
 dropPositions.forEach((elem) => {
@@ -43,4 +86,6 @@ dropPositions.forEach((elem) => {
     elem.addEventListener("dragenter", dragenter);
     elem.addEventListener("dragover", dragover);
     elem.addEventListener("drop", dragdrop);
+
+    elem.addEventListener("touchend", touchdrop);
 });
